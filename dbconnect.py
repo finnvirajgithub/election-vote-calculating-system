@@ -34,11 +34,9 @@ def create_tables():
     
     mycursor.execute("""
     CREATE TABLE IF NOT EXISTS vote (
-        vote_id INT PRIMARY KEY AUTO_INCREMENT,
         citizen_NIC VARCHAR(20),
         candidate_NIC VARCHAR(20),
-        FOREIGN KEY (citizen_NIC) REFERENCES citizen(NIC),
-        FOREIGN KEY (candidate_NIC) REFERENCES candidate(NIC)
+        electtion_No int
     )
     """)
     

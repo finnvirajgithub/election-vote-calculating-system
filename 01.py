@@ -26,7 +26,7 @@ class Candidate(Citizen):
     self.edu = edu
     
     sql = 'INSERT INTO candidate VALUES(%s,%s,%s,%s,%s,%s,%s)'
-    values = (self.NIC, self.name, self.elect_no, self.age, self.party, self.province, self.edu)
+    values = (self.NIC, self.name, self.elect_no, self.age, self.province, self.party, self.edu)
     mycursor.execute(sql,values)
     conn.commit()
 
@@ -109,7 +109,7 @@ def view_citizen():
   goBack()
   
   
-#Add vote
+#check citizen valid or not
 
 def check_validity():
   os.system('cls')
@@ -123,10 +123,6 @@ def check_validity():
   get_citizen_details = 'SELECT * FROM citizen'
   mycursor.execute(get_citizen_details)
   citizen_details = mycursor.fetchall()
-  
-  # get_candidate_details = 'SELECT * FROM candidate'
-  # mycursor.execute(get_candidate_details)
-  # candidate_details = mycursor.fetchall()
   
   for nic in citizen_details:
     if (nic[0] == input_nic):
@@ -142,12 +138,62 @@ def check_validity():
   #check age > 18
   if (the_nic):
     if (the_age>18):
-      print("\t\t You can Vote!!")
+      check_past(input_nic,the_province)
     else:
       print("\t\tYou can't vote")
+      goBack()
   else:
     print("\t\tYou can't vote") 
+    goBack()
   
+  
+#check past votes
+
+def check_past(nic,province):
+  get_vote_details = 'SELECT * FROM vote'
+  mycursor.execute(get_vote_details)
+  vote_details = mycursor.fetchall()
+  
+  print(vote_details)
+  
+  if not vote_details:
+    add_vote(nic,province)
+  else:
+    for vote in vote_details:
+      if(vote[1]==nic):
+        print("\t\t\You Already voted!")
+        goBack()
+      else:
+        add_vote(nic,province)
+  
+  
+#add vote
+
+def add_vote(nic,province):
+  os.system('cls')
+  print("\n\n------------------------ELECTION VOTING SYSTEM------------------------\n\n\n")
+  
+  #get election number
+  
+  elec_no = int(input("\t\t Enter the Election Number of the candidate : "))
+  
+  #check citizens province equal to candidates province
+  
+  get_candidate_details = 'SELECT * FROM candidate WHERE election_number = %s'
+  mycursor.execute(get_candidate_details, (elec_no,))
+  candidate_details = mycursor.fetchall()
+  
+  for candidate in candidate_details:
+    if (candidate[4]==province):
+      #add vote
+      sql = 'INSERT INTO vote VALUES (%s,%s,%s)'
+      values = (candidate[0],nic,elec_no)
+      mycursor.execute(sql,values)
+      conn.commit()
+    else:
+      print("\t\tYou can't vote another province candidates.")
+  
+  goBack()
 
 def goBack():
   user_input = input("\t\t To go back to main menu please enter 'E' or 'e' :")
