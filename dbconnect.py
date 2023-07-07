@@ -15,6 +15,7 @@ def create_tables():
     CREATE TABLE IF NOT EXISTS candidate (
         NIC VARCHAR(20) PRIMARY KEY,
         name VARCHAR(50),
+        election_number int,
         age INT,
         province VARCHAR(30),
         party VARCHAR(50),
@@ -28,6 +29,16 @@ def create_tables():
         name VARCHAR(50),
         age INT,
         province VARCHAR(30)
+    )
+    """)
+    
+    mycursor.execute("""
+    CREATE TABLE IF NOT EXISTS vote (
+        vote_id INT PRIMARY KEY AUTO_INCREMENT,
+        citizen_NIC VARCHAR(20),
+        candidate_NIC VARCHAR(20),
+        FOREIGN KEY (citizen_NIC) REFERENCES citizen(NIC),
+        FOREIGN KEY (candidate_NIC) REFERENCES candidate(NIC)
     )
     """)
     

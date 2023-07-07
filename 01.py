@@ -19,13 +19,14 @@ class Citizen():
     pass
 
 class Candidate(Citizen):
-  def __init__(self, name, NIC, age, party, province, edu):
+  def __init__(self, name, NIC, elect_no, age, party, province, edu):
     super().__init__(name, NIC, age, province)
+    self.elect_no = elect_no
     self.party = party
     self.edu = edu
     
-    sql = 'INSERT INTO candidate VALUES(%s,%s,%s,%s,%s,%s)'
-    values = (self.NIC, self.name, self.age, self.party, self.province, self.edu)
+    sql = 'INSERT INTO candidate VALUES(%s,%s,%s,%s,%s,%s,%s)'
+    values = (self.NIC, self.name, self.elect_no, self.age, self.party, self.province, self.edu)
     mycursor.execute(sql,values)
     conn.commit()
 
@@ -38,12 +39,13 @@ def add_candidate():
   
   name = input("\t\tEnter the name : ")
   nic = input("\t\tEnter the NIC number : ")
+  elect_no = int(input("\t\tEnter the election number : "))
   age = int(input("\t\tEnter the age : "))
   party = input("\t\tEnter the Political Party : ")
   province = input("\t\tEnter the province : ")
   edu = input("\t\tEnter the education qualifications(No O/L / O/L / A/L / Graduate) : ")
   
-  name = Candidate(name,nic,age,party,province,edu)
+  name = Candidate(name,nic,elect_no,age,party,province,edu)
 
   goBack()
   
@@ -61,10 +63,11 @@ def view_candidate():
   for candidate in candidates:
     print("\t\tNIC                     : ", candidate[0])
     print("\t\tName                    : ", candidate[1])
-    print("\t\tAge                     : ", candidate[2])
-    print("\t\tParty                   : ", candidate[3])
-    print("\t\tProvince                : ", candidate[4])
-    print("\t\tEducation qualification : ", candidate[5])
+    print("\t\tElection Number         : ", candidate[2])
+    print("\t\tAge                     : ", candidate[3])
+    print("\t\tParty                   : ", candidate[4])
+    print("\t\tProvince                : ", candidate[5])
+    print("\t\tEducation qualification : ", candidate[6])
     print("\n\n\n")
   
   goBack()
@@ -106,9 +109,44 @@ def view_citizen():
   goBack()
   
   
-def add_vote():
+#Add vote
+
+def check_validity():
   os.system('cls')
   print("\n\n------------------------ELECTION VOTING SYSTEM------------------------\n\n\n")
+  
+  #get nic
+  input_nic = input("Enter the NIC : ")
+  print("\n\n\n")
+  
+  #check nic in citizen table
+  get_citizen_details = 'SELECT * FROM citizen'
+  mycursor.execute(get_citizen_details)
+  citizen_details = mycursor.fetchall()
+  
+  # get_candidate_details = 'SELECT * FROM candidate'
+  # mycursor.execute(get_candidate_details)
+  # candidate_details = mycursor.fetchall()
+  
+  for nic in citizen_details:
+    if (nic[0] == input_nic):
+      the_nic = True
+      the_age = nic[2]
+      the_province = nic[3]
+      break
+    else:
+      the_nic = False
+      continue
+  
+  
+  #check age > 18
+  if (the_nic):
+    if (the_age>18):
+      print("\t\t You can Vote!!")
+    else:
+      print("\t\tYou can't vote")
+  else:
+    print("\t\tYou can't vote") 
   
 
 def goBack():
@@ -143,7 +181,7 @@ def main():
     view_citizen()
     
   elif (user_input==5):
-    add_vote()
+    check_validity()
 
 main()
 
