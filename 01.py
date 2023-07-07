@@ -1,5 +1,6 @@
 from dbconnect import conn, mycursor
 import os
+import matplotlib.pyplot as plt
 
 #classes
 
@@ -186,14 +187,100 @@ def add_vote(nic,province):
   for candidate in candidate_details:
     if (candidate[4]==province):
       #add vote
-      sql = 'INSERT INTO vote VALUES (%s,%s,%s)'
-      values = (candidate[0],nic,elec_no)
+      sql = 'INSERT INTO vote VALUES (%s,%s,%s,%s,%s)'
+      values = (candidate[0],nic,elec_no,candidate[4],candidate[5])
       mycursor.execute(sql,values)
       conn.commit()
     else:
       print("\t\tYou can't vote another province candidates.")
   
   goBack()
+
+#show chart province vice
+def province_vise():
+  sql = "SELECT province, count(*) FROM vote GROUP BY province"
+  mycursor.execute(sql)
+  data = mycursor.fetchall()
+  
+  provinces = []
+  counts = []
+  
+  for row in data:
+    province = row[0]
+    count = row[1]
+    provinces.append(province)
+    counts.append(counts)
+  
+  #create bar chats
+  
+  plt.bar(provinces, counts)
+  plt.xlabel('Provinces')
+  plt.ylabel('Votes')
+  plt.title('Votes in Province vise')
+  plt.show()
+
+def party_vise():
+  sql = "SELECT party, count(*) FROM vote GROUP BY party"
+  mycursor.execute(sql)
+  data = mycursor.fetchall()
+  
+  parties = []
+  counts = []
+  
+  for row in data:
+    party = row[0]
+    count = row[1]
+    parties.append(party)
+    counts.append(counts)
+  
+  #create bar chats
+  
+  plt.bar(parties, counts)
+  plt.xlabel('Parties')
+  plt.ylabel('Votes')
+  plt.title('Votes in party vise')
+  plt.show()
+
+def candidate_vise():
+  sql = "SELECT electtion_No, count(*) FROM vote GROUP BY electtion_No"
+  mycursor.execute(sql)
+  data = mycursor.fetchall()
+  
+  candidates = []
+  counts = []
+  
+  for row in data:
+    candidate = row[0]
+    count = row[1]
+    candidates.append(candidate)
+    counts.append(counts)
+  
+  #create bar chats
+  
+  plt.bar(candidates, counts)
+  plt.xlabel('Candidates')
+  plt.ylabel('Votes')
+  plt.title('Votes in candidate vise')
+  plt.show()
+  
+def view_results():
+  os.system('cls')
+  print("\n\n------------------------ELECTION VOTING SYSTEM------------------------\n\n\n")
+  
+  print("\t\t\t1.Province vise Votes")
+  print("\t\t\t2.Party vise Votes")
+  print("\t\t\t1.Candidate vise Votes")
+  
+  user_input = int(input("Enter A Value : "))
+  
+  if (user_input==1):
+    province_vise()
+    
+  elif (user_input==2):
+    party_vise()
+    
+  elif (user_input==3):
+    candidate_vise()
 
 def goBack():
   user_input = input("\t\t To go back to main menu please enter 'E' or 'e' :")
@@ -210,6 +297,7 @@ def main():
   print("\t\t\t3. Add a citizen")
   print("\t\t\t4. View citizens")
   print("\t\t\t5. Add A Vote\n\n")
+  print("\t\t\t6. View results\n\n")
 
   user_input = int(input("Enter A Value : "))
 
@@ -228,6 +316,9 @@ def main():
     
   elif (user_input==5):
     check_validity()
+  
+  elif (user_input==6):
+    view_results()
 
 main()
 

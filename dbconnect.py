@@ -36,7 +36,9 @@ def create_tables():
     CREATE TABLE IF NOT EXISTS vote (
         citizen_NIC VARCHAR(20),
         candidate_NIC VARCHAR(20),
-        electtion_No int
+        electtion_No int,
+        province VARCHAR(30),
+        party VARCHAR(50)
     )
     """)
     
