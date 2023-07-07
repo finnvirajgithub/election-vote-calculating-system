@@ -6,6 +6,7 @@ conn = mysql.connector.connect(
     password=""
 )
 mycursor = conn.cursor()
+mycursor.execute('CREATE DATABASE IF NOT EXISTS ELECTION_VOTING_SYSTEM')
 
 def create_tables():
     mycursor.execute("USE ELECTION_VOTING_SYSTEM")
@@ -26,7 +27,7 @@ def create_tables():
         NIC VARCHAR(20) PRIMARY KEY,
         name VARCHAR(50),
         age INT,
-        province VARCHAR(30),
+        province VARCHAR(30)
     )
     """)
     

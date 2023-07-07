@@ -1,6 +1,8 @@
 from dbconnect import conn, mycursor
 import os
 
+#classes
+
 class Citizen():
   def __init__(self,name,NIC,age,province):
     self.name = name
@@ -27,6 +29,9 @@ class Candidate(Citizen):
     mycursor.execute(sql,values)
     conn.commit()
 
+
+#Add candidates
+
 def add_candidate():
   os.system('cls')
   print("\n\n------------------------ELECTION VOTING SYSTEM------------------------\n\n\n")
@@ -40,11 +45,32 @@ def add_candidate():
   
   name = Candidate(name,nic,age,party,province,edu)
 
+  goBack()
+  
+  
+#View Candidates
+
 def view_candidate():
   os.system('cls')
   print("\n\n------------------------ELECTION VOTING SYSTEM------------------------\n\n\n")
   
+  view_candidate = 'SELECT * FROM candidate'
+  mycursor.execute(view_candidate)
+  candidates = mycursor.fetchall()
   
+  for candidate in candidates:
+    print("\t\tNIC                     : ", candidate[0])
+    print("\t\tName                    : ", candidate[1])
+    print("\t\tAge                     : ", candidate[2])
+    print("\t\tParty                   : ", candidate[3])
+    print("\t\tProvince                : ", candidate[4])
+    print("\t\tEducation qualification : ", candidate[5])
+    print("\n\n\n")
+  
+  goBack()
+  
+  
+#Add citizen
 
 def add_citizen():
   os.system('cls')
@@ -57,43 +83,69 @@ def add_citizen():
   
   name = Citizen(name,nic,age,province)
 
+  goBack()
+  
+  
+#View Citizens
+
 def view_citizen():
   os.system('cls')
   print("\n\n------------------------ELECTION VOTING SYSTEM------------------------\n\n\n")
+  
+  view_citizen = 'SELECT * FROM citizen'
+  mycursor.execute(view_citizen)
+  citizens = mycursor.fetchall()
+  
+  for citizen in citizens:
+    print("\t\tNIC                     : ", citizen[0])
+    print("\t\tName                    : ", citizen[1])
+    print("\t\tAge                     : ", citizen[2])
+    print("\t\tProvince                : ", citizen[3])
+    print("\n\n\n")
 
+  goBack()
+  
+  
 def add_vote():
   os.system('cls')
   print("\n\n------------------------ELECTION VOTING SYSTEM------------------------\n\n\n")
   
-  
-  
-print("\n\n------------------------ELECTION VOTING SYSTEM------------------------\n\n\n")
 
-print("\t\t\t1. Add A Candidates")
-print("\t\t\t2. View candidates")
-print("\t\t\t3. Add a citizen")
-print("\t\t\t4. View citizens")
-print("\t\t\t5. Add A Vote\n\n")
+def goBack():
+  user_input = input("\t\t To go back to main menu please enter 'E' or 'e' :")
+  
+  if (user_input=='E' or user_input=='e'):
+    main()
+  
+def main():  
+  os.system('cls')
+  print("\n\n------------------------ELECTION VOTING SYSTEM------------------------\n\n\n")
 
-user_input = int(input("Enter A Value : "))
+  print("\t\t\t1. Add A Candidates")
+  print("\t\t\t2. View candidates")
+  print("\t\t\t3. Add a citizen")
+  print("\t\t\t4. View citizens")
+  print("\t\t\t5. Add A Vote\n\n")
 
-  
-if (user_input==1):
-  add_candidate()
-  
-elif (user_input==2):
-  view_candidate()
-  
-elif (user_input==3):
-  add_citizen()
-  
-elif (user_input==4):
-  view_citizen()
-  
-elif (user_input==5):
-  add_vote()
+  user_input = int(input("Enter A Value : "))
 
+    
+  if (user_input==1):
+    add_candidate()
+    
+  elif (user_input==2):
+    view_candidate()
+    
+  elif (user_input==3):
+    add_citizen()
+    
+  elif (user_input==4):
+    view_citizen()
+    
+  elif (user_input==5):
+    add_vote()
 
+main()
 
 
   
