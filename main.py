@@ -57,20 +57,24 @@ def view_candidate():
   os.system('cls')
   print("\n\n------------------------ELECTION VOTING SYSTEM------------------------\n\n\n")
   
-  view_candidate = 'SELECT * FROM candidate'
-  mycursor.execute(view_candidate)
-  candidates = mycursor.fetchall()
+  try:
+    view_candidate = 'SELECT * FROM candidate'
+    mycursor.execute(view_candidate)
+    candidates = mycursor.fetchall()
+    
+    for candidate in candidates:
+      print("\t\tNIC                     : ", candidate[0])
+      print("\t\tName                    : ", candidate[1])
+      print("\t\tElection Number         : ", candidate[2])
+      print("\t\tAge                     : ", candidate[3])
+      print("\t\tParty                   : ", candidate[4])
+      print("\t\tProvince                : ", candidate[5])
+      print("\t\tEducation qualification : ", candidate[6])
+      print("\n\n\n")
   
-  for candidate in candidates:
-    print("\t\tNIC                     : ", candidate[0])
-    print("\t\tName                    : ", candidate[1])
-    print("\t\tElection Number         : ", candidate[2])
-    print("\t\tAge                     : ", candidate[3])
-    print("\t\tParty                   : ", candidate[4])
-    print("\t\tProvince                : ", candidate[5])
-    print("\t\tEducation qualification : ", candidate[6])
-    print("\n\n\n")
-  
+  except:
+    database_error()
+    
   goBack()
   
   
@@ -96,17 +100,20 @@ def view_citizen():
   os.system('cls')
   print("\n\n------------------------ELECTION VOTING SYSTEM------------------------\n\n\n")
   
-  view_citizen = 'SELECT * FROM citizen'
-  mycursor.execute(view_citizen)
-  citizens = mycursor.fetchall()
-  
-  for citizen in citizens:
-    print("\t\tNIC                     : ", citizen[0])
-    print("\t\tName                    : ", citizen[1])
-    print("\t\tAge                     : ", citizen[2])
-    print("\t\tProvince                : ", citizen[3])
-    print("\n\n\n")
+  try:
+    view_citizen = 'SELECT * FROM citizen'
+    mycursor.execute(view_citizen)
+    citizens = mycursor.fetchall()
+    
+    for citizen in citizens:
+      print("\t\tNIC                     : ", citizen[0])
+      print("\t\tName                    : ", citizen[1])
+      print("\t\tAge                     : ", citizen[2])
+      print("\t\tProvince                : ", citizen[3])
+      print("\n\n\n")
 
+  except:
+    database_error()
   goBack()
   
   
@@ -120,10 +127,14 @@ def check_validity():
   input_nic = input("Enter the NIC : ")
   print("\n\n\n")
   
-  #check nic in citizen table
-  get_citizen_details = 'SELECT * FROM citizen'
-  mycursor.execute(get_citizen_details)
-  citizen_details = mycursor.fetchall()
+  try:
+    #check nic in citizen table
+    get_citizen_details = 'SELECT * FROM citizen'
+    mycursor.execute(get_citizen_details)
+    citizen_details = mycursor.fetchall()
+  
+  except:
+    database_error()
   
   for nic in citizen_details:
     if (nic[0] == input_nic):
@@ -151,9 +162,14 @@ def check_validity():
 #check past votes
 
 def check_past(nic,province):
-  get_vote_details = 'SELECT * FROM vote'
-  mycursor.execute(get_vote_details)
-  vote_details = mycursor.fetchall()
+  
+  try:
+    get_vote_details = 'SELECT * FROM vote'
+    mycursor.execute(get_vote_details)
+    vote_details = mycursor.fetchall()
+  
+  except:
+    database_error()
   
   print(vote_details)
   
@@ -179,28 +195,39 @@ def add_vote(nic,province):
   elec_no = int(input("\t\t Enter the Election Number of the candidate : "))
   
   #check citizens province equal to candidates province
+
+  try:
+    get_candidate_details = 'SELECT * FROM candidate WHERE election_number = %s'
+    mycursor.execute(get_candidate_details, (elec_no,))
+    candidate_details = mycursor.fetchall()
   
-  get_candidate_details = 'SELECT * FROM candidate WHERE election_number = %s'
-  mycursor.execute(get_candidate_details, (elec_no,))
-  candidate_details = mycursor.fetchall()
-  
-  for candidate in candidate_details:
-    if (candidate[4]==province):
-      #add vote
-      sql = 'INSERT INTO vote VALUES (%s,%s,%s,%s,%s)'
-      values = (candidate[0],nic,elec_no,candidate[4],candidate[5])
-      mycursor.execute(sql,values)
-      conn.commit()
-    else:
-      print("\t\tYou can't vote another province candidates.")
+    
+    for candidate in candidate_details:
+      if (candidate[4]==province):
+        #add vote
+        sql = 'INSERT INTO vote VALUES (%s,%s,%s,%s,%s)'
+        values = (candidate[0],nic,elec_no,candidate[4],candidate[5])
+        mycursor.execute(sql,values)
+        conn.commit()
+        goBack()
+      else:
+        print("\t\tYou can't vote another province candidates.")
+    
+  except:
+    database_error()
   
   goBack()
 
-#show chart province vice
-def province_vise():
-  sql = "SELECT province, count(*) FROM vote GROUP BY province"
-  mycursor.execute(sql)
-  data = mycursor.fetchall()
+#show chart province wise
+def province_wise():
+  
+  try:
+    sql = "SELECT province, COUNT(*) FROM vote GROUP BY province"
+    mycursor.execute(sql)
+    data = mycursor.fetchall()
+    
+  except:
+    database_error()
   
   provinces = []
   counts = []
@@ -209,20 +236,28 @@ def province_vise():
     province = row[0]
     count = row[1]
     provinces.append(province)
-    counts.append(counts)
+    counts.append(count)
   
-  #create bar chats
+  #plot bar chats
   
   plt.bar(provinces, counts)
   plt.xlabel('Provinces')
   plt.ylabel('Votes')
-  plt.title('Votes in Province vise')
+  plt.title('Votes in Province wise')
   plt.show()
+  goBack()
+  
 
-def party_vise():
-  sql = "SELECT party, count(*) FROM vote GROUP BY party"
-  mycursor.execute(sql)
-  data = mycursor.fetchall()
+#plot chart party wise
+def party_wise():
+  
+  try:
+    sql = "SELECT party, COUNT(*) FROM vote GROUP BY party"
+    mycursor.execute(sql)
+    data = mycursor.fetchall()
+  
+  except:
+    database_error()
   
   parties = []
   counts = []
@@ -231,20 +266,28 @@ def party_vise():
     party = row[0]
     count = row[1]
     parties.append(party)
-    counts.append(counts)
+    counts.append(count)
   
-  #create bar chats
+  #plot bar chats
   
   plt.bar(parties, counts)
   plt.xlabel('Parties')
   plt.ylabel('Votes')
-  plt.title('Votes in party vise')
+  plt.title('Votes in party wise')
   plt.show()
+  goBack()
+  
 
-def candidate_vise():
-  sql = "SELECT electtion_No, count(*) FROM vote GROUP BY electtion_No"
-  mycursor.execute(sql)
-  data = mycursor.fetchall()
+#plot charts candidate wise
+def candidate_wise():
+  
+  try:
+    sql = "SELECT electtion_No, COUNT(*) FROM vote GROUP BY electtion_No"
+    mycursor.execute(sql)
+    data = mycursor.fetchall()
+  
+  except:
+    database_error()
   
   candidates = []
   counts = []
@@ -253,41 +296,53 @@ def candidate_vise():
     candidate = row[0]
     count = row[1]
     candidates.append(candidate)
-    counts.append(counts)
+    counts.append(count)
   
-  #create bar chats
+  #plot bar chats
   
   plt.bar(candidates, counts)
   plt.xlabel('Candidates')
   plt.ylabel('Votes')
-  plt.title('Votes in candidate vise')
+  plt.title('Votes in candidate wise')
   plt.show()
-  
+  goBack()
+
+
+ 
 def view_results():
   os.system('cls')
   print("\n\n------------------------ELECTION VOTING SYSTEM------------------------\n\n\n")
   
-  print("\t\t\t1.Province vise Votes")
-  print("\t\t\t2.Party vise Votes")
-  print("\t\t\t1.Candidate vise Votes")
+  print("\t\t\t1.Province wise Votes")
+  print("\t\t\t2.Party wise Votes")
+  print("\t\t\t3.Candidate wise Votes\n\n")
   
-  user_input = int(input("Enter A Value : "))
+  user_input = int(input("\t\tEnter A Value : "))
   
   if (user_input==1):
-    province_vise()
+    province_wise()
     
   elif (user_input==2):
-    party_vise()
+    party_wise()
     
   elif (user_input==3):
-    candidate_vise()
+    candidate_wise()
 
+#Route to the main menu
 def goBack():
-  user_input = input("\t\t To go back to main menu please enter 'E' or 'e' :")
+  user_input = input("\n\n\t\t To go back to main menu please enter 'E' or 'e' :")
   
   if (user_input=='E' or user_input=='e'):
     main()
+
+#Error handling
+#Error in database
+def database_error():
+  print("\n\n\t\tProblem with database") 
+  goBack()
   
+
+#Main function
 def main():  
   os.system('cls')
   print("\n\n------------------------ELECTION VOTING SYSTEM------------------------\n\n\n")
@@ -296,8 +351,9 @@ def main():
   print("\t\t\t2. View candidates")
   print("\t\t\t3. Add a citizen")
   print("\t\t\t4. View citizens")
-  print("\t\t\t5. Add A Vote\n\n")
-  print("\t\t\t6. View results\n\n")
+  print("\t\t\t5. Add A Votecls")
+  print("\t\t\t6. View results")
+  print("\t\t\t7. Exit\n\n")
 
   user_input = int(input("Enter A Value : "))
 
@@ -319,6 +375,9 @@ def main():
   
   elif (user_input==6):
     view_results()
+  
+  elif (user_input==7):
+    exit()
 
 main()
 
