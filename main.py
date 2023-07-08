@@ -162,7 +162,7 @@ def check_validity():
 #check past votes
 
 def check_past(nic,province):
-  
+  count = 0
   try:
     get_vote_details = 'SELECT * FROM vote'
     mycursor.execute(get_vote_details)
@@ -171,18 +171,21 @@ def check_past(nic,province):
   except:
     database_error()
   
-  print(vote_details)
-  
   if not vote_details:
     add_vote(nic,province)
+    
   else:
     for vote in vote_details:
-      if(vote[1]==nic):
-        print("\t\t\You Already voted!")
-        goBack()
-      else:
-        add_vote(nic,province)
-  
+      if(vote[0]==nic):
+        count=+1
+        
+    
+    if(count>0):
+      print("\t\t\tYou Already voted!")
+    else:
+      add_vote(nic,province)
+        
+  goBack()
   
 #add vote
 
@@ -377,6 +380,7 @@ def main():
     view_results()
   
   elif (user_input==7):
+    conn.close()
     exit()
 
 main()
